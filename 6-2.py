@@ -1,6 +1,6 @@
 a = open('6.txt').read().split('\n')
 
-actions = {'turn on': lambda x: 1, 'turn off': lambda x: 0, 'toggle': lambda x: (x + 1)%2}
+actions = {'turn on': lambda x: x + 1, 'turn off': lambda x: max(x - 1, 0), 'toggle': lambda x: x + 2}
 
 def modify(act, g, c1, c2):
     for y in range(c1[1], c2[1] + 1):

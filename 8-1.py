@@ -1,0 +1,1 @@
+print sum([len(x)-len(eval(x)) for x in open('8').read().split()])
