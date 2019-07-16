@@ -27,6 +27,8 @@ while lines:
                 args, target = m.groups()[:-1], m.groups()[-1]
                 args = [get_value(wires, a) for a in args]
                 wires[target] = f(*args)
+                if target == 'b':
+                    wires[target] = 3176
                 break
     except:
         lines.append(line)
