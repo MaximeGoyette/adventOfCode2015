@@ -1,25 +1,39 @@
 import re
-import time
+import traceback
 
-challenge_input = open('7.txt').read().split('\n')
+lines = '''123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i'''.replace('\r', '').split('\n')
+lines = open('7.txt').read().replace('\r', '').split('\n')
+wires = {}
 
-var = {}
+ops = {
+    r'^NOT (\w+) -> (\w+)$': lambda a: 65535-a,
+    r'^(\w+) OR (\w+) -> (\w+)$': lambda a, b: a|b,
+    r'^(\w+) AND (\w+) -> (\w+)$': lambda a, b: a&b,
+    r'^(\w+) LSHIFT (\w+) -> (\w+)$': lambda a, b: a<<b,
+    r'^(\w+) RSHIFT (\w+) -> (\w+)$': lambda a, b: a>>b,
+    r'^(\w+) -> (\w)$': lambda a: a
+}
 
-for cmd in challenge_input:
-    var[cmd.split(' -> ')[1]] = cmd.split(' -> ')[0].replace('NOT ', '~').replace(' AND ', '&').replace(' OR ', '|').replace(' LSHIFT ', '<<').replace(' RSHIFT ', '>>')
+while lines:
+    print(len(lines))
+    line = lines.pop(0)
+    try:
+        for op, f in ops.iteritems():
+            m = re.match(op, line)
+            if m:
+                args, target = m.groups()[:-1], m.groups()[-1]
+                args = [wires.get(a) or int(a) for a in args]
+                wires[target] = f(*args)
+                break
+    except:
+        traceback.print_exc()
+        lines.append(line)
 
-def eval_next(x):
-    if x in ['', '&', '~', '|', '<<', '>>'] or x.isdigit():
-        return x
-    else:
-        val = eval(''.join(map(eval_next, re.split('(&|\||>>|<<|~)', var[x]))))
-        return str(val) if val > 0 else str(65536 + val)
-
-print eval_next('d')
-print eval_next('e')
-print eval_next('f')
-print eval_next('g')
-print eval_next('h')
-print eval_next('i')
-print eval_next('x')
-print eval_next('y')
+print wires
